@@ -1,0 +1,82 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  box-sizing: border-box;
+}
+/* html {
+  background: linear-gradient(to right bottom, #2980b9, #6dd5fa, #ffffff);
+} */
+
+/* select{
+  background-color: #eee;
+	border: none;
+	padding: 12px 15px;
+	margin: 8px 0;
+} */
+/* input{
+  background-color: #eee;
+	border: none;
+	padding: 12px 15px;
+	margin: 8px 0;
+} */
+/* button {
+	border-radius: 20px;
+	border: 1px solid #6dd5fa;
+	background-color: #6dd5fa;
+	color: #FFFFFF;
+	font-size: 12px;
+	font-weight: bold;
+	padding: 12px 45px;
+	letter-spacing: 1px;
+  text-transform: uppercase;
+} */
+
+/* .save:hover {
+  background-color: $color-primary;
+  color: $color-white;
+  box-shadow: 0 1rem 2rem rgba($color-black, .15);
+  transform: translateY(-2px);
+} */
+
+
+/* 
+input {
+	font-size: 18px;
+	padding: 10px 10px 10px 5px;
+	-webkit-appearance: none;
+	display: block;
+	background: #fafafa;
+	color: #636363;
+	width: 100%;
+	border: none;
+	border-radius: 0;
+	border-bottom: 1px solid #757575;
+}
+
+input:focus { outline: none; }
+
+
+/* Label */
+
+/* label {
+	color: #999;
+	font-size: 18px;
+	font-weight: normal;
+	position: absolute;
+	pointer-events: none;
+	left: 5px;
+	top: 10px;
+	transition: all 0.2s ease;
+} */
+
+
+/* active */
+
+/* input:focus ~ label, input.used ~ label {
+	top: -20px;
+  transform: scale(.75); left: -2px;
+	/* font-size: 14px; */
+  /* color: #4a89dc; */
+  
+/* }   */
