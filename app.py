@@ -16,12 +16,16 @@ from selenium.webdriver.support import expected_conditions as EC
 
 app=Flask(__name__)
 
-app.config["MONGO_DBNAME"]="trydb"
-app.config["MONGO_URI"]="mongodb://127.0.0.1:27017/trydb"
+app.config["MONGO_DBNAME"]="byedb"
+app.config["MONGO_URI"]="mongodb://127.0.0.1:27017/byedb"
+
+
 
 mongo=PyMongo(app)
 CORS(app)
-db= mongo.db.trydb
+db= mongo.db.byedb
+
+
 
 #Containers
 cont=joblib.load('pkl/cont/Container.pkl')
@@ -175,9 +179,12 @@ current_time = datetime.now()
 
 
 
+@app.template_filter("jsonit")
+def jsonit(s):
+    return json.loads(s)
 
 
-
+#596765.7798643713, 172143.97496087637, 102556.07720396452, 128534.16797078768]
 @app.route('/berth',methods=['POST','GET'])
 def berth():
     return render_template('berth_res.html')
@@ -187,10 +194,22 @@ def dashboard():
     if request.method=="POST":
         return 'Success'
     else:
+        max_prod=1000000
         current=[]
         expected=[]
         upcoming=[]
         instances=[]
+        current_revenue=[]
+        current_weight=[]
+        percent_revenue=[]
+        percent_weight=[]
+        percent_ratios=[]
+        final_ratio=[]
+        productivity=[]
+        time_dist=[]
+        diff=[]
+        
+        new_productivity=[]
         for i in db.find():
             tepm=json.loads(i['data']['details'])
             temp_time=datetime.strptime(tepm['eta'],'%Y-%m-%dT%H:%M')
@@ -198,10 +217,62 @@ def dashboard():
                 current.append(i)
             elif((temp_time-current_time).total_seconds()<=86400):
                 expected.append(i)
+            
             else:
                 upcoming.append(i)
             #instances.append()
-        return render_template('dashboard.html',current=current,expected=expected,upcoming=upcoming,instances=instances)
+        for i in current:
+            current_revenue.append(json.loads(i["data"]["details"])["revenue"])
+            current_weight.append(sum(list(map(lambda x:float(x), json.loads(i["data"]["details"])['Weight']))))
+        total_revenue=sum(current_revenue)
+        total_weight=sum(current_weight)
+        for i in range(len(current_revenue)):
+            percent_revenue.append((current_revenue[i])/total_revenue)
+            percent_weight.append((current_weight[i])/total_weight)
+            percent_ratios.append(percent_revenue[i]/percent_weight[i])
+        percent_ratios_sum=sum(percent_ratios)
+        for i in range(len(current_revenue)):
+            final_ratio.append(percent_ratios[i]/percent_ratios_sum)
+            productivity.append(final_ratio[i]*max_prod)
+            time_dist.append(current_weight[i]/productivity[i])
+        
+        if len(expected)>0:
+            min_time=time_dist.index(min(time_dist))
+            # time_dist2=time_dist.copy()
+            # time_dist2.pop(min_time)
+            # current[min_time]
+            for i in range(len(productivity)):
+                if i==min_time:
+                    pass 
+                else:
+                    com_no=json.loads(current[i]["data"]["details"])["Count"]-1
+                    for j in range(com_no):
+                        com_prod=[]
+                        com_prod.append(switcher[json.loads(current[i]["data"]['details'])["Commodities"][j]].predict([[float(json.loads(current[i]["data"]['details'])["Weight"][j])]])[0])
+                    com_prod_sum=sum(com_prod)
+                    # new_productivity[i]= com_prod_sum if com_prod_sum<productivity[i] else productivity[i]
+                    if(com_prod_sum<productivity[i]):
+                        diff.append(productivity[i]-com_prod_sum)
+                        new_productivity.insert(i,com_prod_sum)
+                    else:
+                        new_productivity.insert(i,productivity[i])
+            new_productivity.insert(min_time, productivity[min_time]+sum(diff))
+        final_productivity=new_productivity if len(new_productivity)>0 else productivity
+              
+
+    #[805743.0817725222, 191815.85677749367, 2441.061449984413]
+    #[581655.4809843401, 167785.23489932888, 125279.64205816553, 125279.64205816553]
+
+
+
+        
+
+        
+        
+
+
+
+        return render_template('dashboard.html',current_revenue=final_productivity,current=current,expected=expected,upcoming=upcoming,instances=instances)
 
 @app.route('/check',methods=['POST','GET'])
 def check():
@@ -282,6 +353,15 @@ def remove():
         "_id":ObjectId(id)
     })
     return jsonify({"Message":"removed!"})
+
+
+@app.route('/maxpro',methods=['GET','POST'])
+def maxpro():
+    if request.method=="POST":
+        db2.insert_one({
+            "port_productivity":request.form['productivity']
+        })
+
 
 
 @app.route('/info',methods=['GET','POST'])

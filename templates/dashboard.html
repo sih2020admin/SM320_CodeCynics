@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title></title>
+
+{% endblock %}
+{% block body %}
+<a href="/berth">berth</a>
+<!-- <p>{{current_revenue}}</p> -->
+<h1>Dashboard</h1>
+<label for="max_prod">Max Productivity</label>
+<input type="number" name="max_prod" id="max_prod"  value="10000"><input type="button" onclick="productivity()" value="Submit">
+<div style="border: 3px solid #31B0D5; overflow: hidden; margin: 15px auto; max-width: 736px;">
+    <iframe scrolling="no" src="https://www.marinetraffic.com/en/ais/home/centerx:69.697/centery:22.734/zoom:14" style="border: 0px none; margin-left: -45px; height: 485px; margin-top: -48px; width: 965px;">
+    </iframe>
+</div><br><br>
+<h2>Current</h2>
+{% for i in current %}
+<p>{{ i }}</p>
+<input type='button' onclick='remove("{{ i["_id"]|safe }}")' id='remove{{i['_id']}}' value='Remove'>
+{% endfor %}
+
+<h2>Expected</h2>
+{% for i in expected %}
+<p>{{ i }}</p>
+<label for="berth">Berth No.</label>
+<select name="berth" id="berth{{i['_id']}}">
+    <option value="1">B01</option>
+    <option value="2">B02</option>
+    <option value="3">B03</option>
+    <option value="4">B04</option>
+    <option value="5">B05</option>
+    <option value="6">B06</option>
+    <option value="7">B07</option>
+    <option value="8">B08</option>
+    <option value="9">B09</option>
+    <option value="10">B10</option>
+    <option value="11">B11</option>
+    <option value="12">B12</option>
+</select>
+
+<input type="button" onclick='productivity();current("{{ i["_id"]|safe }}")' id='button{{i['_id']}}' value='Arrived'>
+{% endfor %}
+
+<h2>Upcoming</h2>
+{% for i in upcoming %}
+{% set j=i["data"]["details"]|jsonit %}
+
+<p>{{ j }}</p>
+
+{% endfor %}
+
+
+
+<input type="text" id='Vname'>
+<input type="button" value="Search" onclick="finder()">
+<p id='result'></p>
+
+<script>
+    function productivity(){
+        var max_prod=$("#max_prod").val();
+        $.ajax({
+            data:{
+                productivity:$("#max_prod").val()
+            },
+            type:"POST",
+            url:"/maxpro"
+        })
+        .done(function(done){
+            console.log("Productivity");
+        })
+    }
+    function current(id){
+        console.log(id);
+        
+        $.ajax({
+            data:{
+                status:'Current',
+                berth:$('#berth'+id).val(),
+                id:id
+
+            },
+            type:"POST",
+            url:'/current'
+        })
+        .done(function(data){
+            console.log(data);
+            location.reload(true);
+
+        })
+    }
+
+    function remove(id){
+        console.log(id);
+        $.ajax({
+            data:{
+                id:id
+            },
+            type:"POST",
+            url:'/remove'
+        })
+        .done(function(data){
+            console.log(data);
+            location.reload(true);
+        })
+
+    }
+    function finder(){
+        $.ajax({
+            data:{
+                "name":$('#Vname').val()
+            },
+            type:"POST",
+            url:'/info'
+        })
+        .done(function(data){
+            console.log(data);
+           $('#result').html(data.info)
+
+        })
+    }
+</script>
+{% endblock %}
