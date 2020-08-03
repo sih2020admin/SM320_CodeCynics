@@ -1,0 +1,83 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  background-color: aqua;
+}
+
+.i-frame {
+  display: flex;
+  width: 557px;
+  height: 578px;
+  border-radius: 20px;
+  margin-top: 20px;
+  float: right;
+  margin-right: 30px;
+}
+
+.i-frame-inside {
+  border: 3px solid #31b0d5;
+  overflow: hidden;
+  margin: 15px auto;
+  max-width: 490px;
+  border-radius: 20px;
+  height: 514px;
+}
+iframe {
+  border: 0px none;
+  margin-left: -45px;
+  height: 485px;
+  margin-top: -48px;
+  width: 965px;
+}
+.curr-head {
+  margin: 30px;
+}
+
+.current {
+  height: 200px;
+  width: 434px;
+  background: white;
+  border-radius: 35px;
+  margin-bottom: 20px;
+  padding: 15;
+}
+.expected {
+    height: 200px;
+    width: 434px;
+    background: white;
+    border-radius: 35px;
+    position: relative;
+    left: 101px;
+    top: 370px;
+    margin-bottom: 20px;
+    padding: 15;
+  }
+  .exp-head {
+    position: relative;
+    top: 250px;
+    left: 82px;
+  }
+  .exp-grad {
+    position: absolute;
+    height: 100px;
+    width: 300px;
+    background: linear-gradient(to right, #f12711, #f5af19);
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+  .exp-h2 {
+    position: relative;
+    top: 25px;
+    left: 20px;
+  }
+.upcomming {
+  height: 200px;
+  width: 434px;
+  background: white;
+  border-radius: 35px;
+  margin-bottom: 20px;
+  padding: 15;
+}

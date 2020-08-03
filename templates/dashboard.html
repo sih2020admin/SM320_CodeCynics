@@ -1,123 +1,271 @@
-{% extends 'base.html' %}
-
-{% block head %}
+{% extends 'base.html' %} {% block head %}
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="{{ url_for('static',filename='dashboard.css') }}"
+/>
 <title></title>
 
-{% endblock %}
-{% block body %}
-<a href="/berth">berth</a>
-<!-- <p>{{current_revenue}}</p> -->
-<h1>Dashboard</h1>
-<label for="max_prod">Max Productivity</label>
-<input type="number" name="max_prod" id="max_prod"  value="10000"><input type="button" onclick="productivity()" value="Submit">
-<div style="border: 3px solid #31B0D5; overflow: hidden; margin: 15px auto; max-width: 736px;">
-    <iframe scrolling="no" src="https://www.marinetraffic.com/en/ais/home/centerx:69.697/centery:22.734/zoom:14" style="border: 0px none; margin-left: -45px; height: 485px; margin-top: -48px; width: 965px;">
-    </iframe>
-</div><br><br>
-<h2>Current</h2>
-{% for i in current %}
-<p>{{ i }}</p>
-<input type='button' onclick='remove("{{ i["_id"]|safe }}")' id='remove{{i['_id']}}' value='Remove'>
-{% endfor %}
+{% endblock %} {% block body %}
 
-<h2>Expected</h2>
-{% for i in expected %}
-<p>{{ i }}</p>
-<label for="berth">Berth No.</label>
-<select name="berth" id="berth{{i['_id']}}">
-    <option value="1">B01</option>
-    <option value="2">B02</option>
-    <option value="3">B03</option>
-    <option value="4">B04</option>
-    <option value="5">B05</option>
-    <option value="6">B06</option>
-    <option value="7">B07</option>
-    <option value="8">B08</option>
-    <option value="9">B09</option>
-    <option value="10">B10</option>
-    <option value="11">B11</option>
-    <option value="12">B12</option>
-</select>
+<div class="full-page">
+  <div class="right">
+    <form action="" class="search">
+      <button
+        type="button"
+        class="search__button focus--box-shadow"
+        value="Search"
+        onclick="finder()"
+      >
+        <img
+          src="https://img.icons8.com/pastel-glyph/45/000000/worldwide-location.png"
+        />
+      </button>
+      <input
+        class="search__input focus--box-shadow"
+        type="text"
+        id="Vname"
+        placeholder="Project search"
+      />
+    </form>
+    <div class="current1">
+      <p id="result"></p><br>
+      {% for i in final_productivity %}
+        <p>{{final_productivity.index(i) ~") "~i}}</p>
+        <br />
+        {% endfor %}
+    </div>
+    <div class="i-frame">
+      <div class="i-frame-inside">
+        <iframe
+          scrolling="no"
+          src="https://www.marinetraffic.com/en/ais/home/centerx:69.697/centery:22.734/zoom:13"
+        >
+        </iframe>
+      </div>
+    </div>
+  </div>
 
-<input type="button" onclick='productivity();current("{{ i["_id"]|safe }}")' id='button{{i['_id']}}' value='Arrived'>
-{% endfor %}
+  <div class="left">
+    <div class="curr-head">
+      <div class="curr-grad">
+        <h2 class="curr-h2" id="currentvessels">Current</h2>
+        <br />
+      </div>
+    </div>
+    <div class="curr-loop">
+      {% for i in current %} {% set j=i["data"]["details"] | jsonit %}
 
-<h2>Upcoming</h2>
-{% for i in upcoming %}
-{% set j=i["data"]["details"]|jsonit %}
+      <div class="current">
+        <div><span> Name: </span>{{i["data"]["name"]}}</div>
+        <div>
+          <span>Commodities:</span>
+          {%for x in j["Commodities"]%}
+          <p>{{x}}</p>
+          {%endfor%}
+        </div>
+        <div>
+          <span>
+            Cargo Type:
+          </span>
+          {{j["Name"]}}
+        </div>
+        <div>
+          <span>
+            Weight:
+          </span>
+          {{j["Weight"]}}
+        </div>
+        <!-- <div>
+          <span>
+            ETA:
+          </span>
+          <input type="datetime-local" disabled value='{{j["eta"]}}' />
+        </div> -->
+        <div>
+          <span>
+            Revenue:
+          </span>
+          {{j["revenue"]}}
+        </div>
+        <!-- <div>
+          <span>
+            TAT:
+          </span>
+          <input type="datetime-local" disabled value='{{j["tat"]}}' />
+        </div> -->
+        <div>
+          <span>
+            Berth
+          </span>
+          {{i["berth"]}}
+        </div>
+        <div>
+          <span>
+            Actual time
+          </span>
+          {{i["ActualTime"]}}
+        </div>
+        <input type='button' onclick='remove("{{ i["_id"]|safe }}")'
+        id='remove{{i['_id']}}' value='Remove'>
+      </div>
 
-<p>{{ j }}</p>
+      {% endfor %}
+    </div>
 
-{% endfor %}
+    <div class="exp-head">
+      <div class="exp-grad">
+        <h2 class="exp-h2" id="expectedvessels">Expected</h2>
+      </div>
+    </div>
 
+    <div class="exp-loop">
+      {% for i in expected %} {% set j=i["data"]["details"] | jsonit %}
+      <div class="expected">
+        <div><span> Name: </span>{{i["data"]["name"]}}</div>
+        <div>
+          <span>Commodities:</span>
+          {%for x in j["Commodities"]%}
+          <p>{{x}}</p>
+          {%endfor%}
+        </div>
+        <div>
+          <span>
+            Cargo Type:
+          </span>
+          {{j["Name"]}}
+        </div>
+        <div>
+          <span>
+            Weight:
+          </span>
+          {{j["Weight"]}}
+        </div>
+        <div>
+          <span>
+            ETA:
+          </span>
+          <input type="datetime-local" disabled value='{{j["eta"]}}' />
+        </div>
+        <div>
+          <span>
+            Revenue:
+          </span>
+          {{j["revenue"]}}
+        </div>
+        <div>
+          <span>
+            TAT:
+          </span>
+          <input type="datetime-local" disabled value='{{j["tat"]}}' />
+        </div>
+        <label for="berth">Berth No.</label>
+        <select name="berth" id="berth{{i['_id']}}">
+          <option value="1">B01</option>
+          <option value="2">B02</option>
+          <option value="3">B03</option>
+          <option value="4">B04</option>
+          <option value="5">B05</option>
+          <option value="6">B06</option>
+          <option value="7">B07</option>
+          <option value="8">B08</option>
+          <option value="9">B09</option>
+          <option value="10">B10</option>
+          <option value="11">B11</option>
+          <option value="12">B12</option>
+        </select>
+        <input type="button" onclick='current("{{ i["_id"]|safe }}")'
+        id='button{{i['_id']}}' value='Arrived'>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="up-head">
+      <div class="up-grad">
+        <h2 class="up-h2" id="upcomingvessels">Upcoming</h2>
+      </div>
+    </div>
+    <div class="up-loop">
+      {% for i in upcoming %} {% set j=i["data"]["details"] | jsonit %}
+      <div class="upcomming">
+        <div><span> Name: </span>{{i["data"]["name"]}}</div>
+        <div>
+          <span>Commodities:</span>
+          {%for x in j["Commodities"]%}
+          <p>{{x}}</p>
+          {%endfor%}
+        </div>
+        <div>
+          <span>
+            Cargo Type:
+          </span>
+          {{j["Name"]}}
+        </div>
+        <div>
+          <span>
+            Weight:
+          </span>
+          {{j["Weight"]}}
+        </div>
+        <div>
+          <span>
+            ETA:
+          </span>
+          <input type="datetime-local" disabled value='{{j["eta"]}}' />
+        </div>
+        <div>
+          <span>
+            Revenue:
+          </span>
+          {{j["revenue"]}}
+        </div>
+        <div>
+          <span>
+            TAT:
+          </span>
+          <input type="datetime-local" disabled value='{{j["tat"]}}' />
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="nav-class">
+    <div class="nav-bar">
+      <nav class="nav vertical">
+        <ul>
+          <li>
+            <a href="#currentvessels" style="text-decoration: none;">
+              <i class="material-icons"
+                ><img
+                  src="https://img.icons8.com/ios-filled/40/000000/region-code.png"
+              /></i>
+            </a>
+          </li>
+          <li>
+            <a href="#expectedvessels" style="text-decoration: none;">
+              <i class="material-icons"
+                ><img
+                  src="https://img.icons8.com/wired/40/000000/marker.png"
+                  alt="Expected"
+              /></i>
+            </a>
+          </li>
+          <li>
+            <a href="#upcomingvessels" style="text-decoration: none;">
+              <i class="material-icons"
+                ><img
+                  src="https://img.icons8.com/ios/40/000000/next-location.png"
+                  alt="Upcoming"
+              /></i>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
 
-
-<input type="text" id='Vname'>
-<input type="button" value="Search" onclick="finder()">
-<p id='result'></p>
-
-<script>
-    function productivity(){
-        var max_prod=$("#max_prod").val();
-        $.ajax({
-            data:{
-                productivity:$("#max_prod").val()
-            },
-            type:"POST",
-            url:"/maxpro"
-        })
-        .done(function(done){
-            console.log("Productivity");
-        })
-    }
-    function current(id){
-        console.log(id);
-        
-        $.ajax({
-            data:{
-                status:'Current',
-                berth:$('#berth'+id).val(),
-                id:id
-
-            },
-            type:"POST",
-            url:'/current'
-        })
-        .done(function(data){
-            console.log(data);
-            location.reload(true);
-
-        })
-    }
-
-    function remove(id){
-        console.log(id);
-        $.ajax({
-            data:{
-                id:id
-            },
-            type:"POST",
-            url:'/remove'
-        })
-        .done(function(data){
-            console.log(data);
-            location.reload(true);
-        })
-
-    }
-    function finder(){
-        $.ajax({
-            data:{
-                "name":$('#Vname').val()
-            },
-            type:"POST",
-            url:'/info'
-        })
-        .done(function(data){
-            console.log(data);
-           $('#result').html(data.info)
-
-        })
-    }
-</script>
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='dashboard.js') }}"
+></script>
 {% endblock %}

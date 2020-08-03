@@ -16,16 +16,12 @@ from selenium.webdriver.support import expected_conditions as EC
 
 app=Flask(__name__)
 
-app.config["MONGO_DBNAME"]="byedb"
-app.config["MONGO_URI"]="mongodb://127.0.0.1:27017/byedb"
-
-
+app.config["MONGO_DBNAME"]="try2db"
+app.config["MONGO_URI"]="mongodb://127.0.0.1:27017/try2db"
 
 mongo=PyMongo(app)
 CORS(app)
-db= mongo.db.byedb
-
-
+db= mongo.db.try2db
 
 #Containers
 cont=joblib.load('pkl/cont/Container.pkl')
@@ -176,15 +172,14 @@ rate={
 
         
 current_time = datetime.now()
-
-
-
 @app.template_filter("jsonit")
 def jsonit(s):
     return json.loads(s)
 
 
-#596765.7798643713, 172143.97496087637, 102556.07720396452, 128534.16797078768]
+
+
+
 @app.route('/berth',methods=['POST','GET'])
 def berth():
     return render_template('berth_res.html')
@@ -193,6 +188,7 @@ def berth():
 def dashboard():
     if request.method=="POST":
         return 'Success'
+    
     else:
         max_prod=1000000
         current=[]
@@ -208,7 +204,7 @@ def dashboard():
         productivity=[]
         time_dist=[]
         diff=[]
-        
+
         new_productivity=[]
         for i in db.find():
             tepm=json.loads(i['data']['details'])
@@ -258,21 +254,10 @@ def dashboard():
                         new_productivity.insert(i,productivity[i])
             new_productivity.insert(min_time, productivity[min_time]+sum(diff))
         final_productivity=new_productivity if len(new_productivity)>0 else productivity
-              
-
-    #[805743.0817725222, 191815.85677749367, 2441.061449984413]
-    #[581655.4809843401, 167785.23489932888, 125279.64205816553, 125279.64205816553]
 
 
+        return render_template('dashboard.html',final_productivity=final_productivity,current=current,expected=expected,upcoming=upcoming,instances=instances)
 
-        
-
-        
-        
-
-
-
-        return render_template('dashboard.html',current_revenue=final_productivity,current=current,expected=expected,upcoming=upcoming,instances=instances)
 
 @app.route('/check',methods=['POST','GET'])
 def check():
@@ -355,15 +340,6 @@ def remove():
     return jsonify({"Message":"removed!"})
 
 
-@app.route('/maxpro',methods=['GET','POST'])
-def maxpro():
-    if request.method=="POST":
-        db2.insert_one({
-            "port_productivity":request.form['productivity']
-        })
-
-
-
 @app.route('/info',methods=['GET','POST'])
 def info():
     if request.method=='POST':
@@ -394,8 +370,8 @@ def info():
             info1=information1.text
             info2=information2.text
             info=info1+"\n"+info2
-        except:
-            driver.close()        
+        finally:
+            driver.quit()        
         return jsonify({
             "info":info
         })    
